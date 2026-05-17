@@ -9,26 +9,33 @@
 // Integer list for testing
 ////////////////////////////////////////////////////////////////////////
 
-class IntListNode : public dslib::ListNode {
+class IntListNode {
 private:
   int m_val;
+  dslib::Link link;
 
   NO_VALUE_SEMANTICS( IntListNode );
 
 public:
-  IntListNode( int val ) : dslib::ListNode(), m_val( val ) { }
+  IntListNode( int val ) : m_val( val ) { }
 
   int get_val() const { return m_val; }
   void set_val( int val ) { m_val = val; }
 
-  static void free_int_list_node( dslib::ListNode *node );
+  static void free_int_list_node( void *node );
+
+  static constexpr unsigned link_offset() {
+    return offsetof( IntListNode, link );
+  }
 };
 
-void IntListNode::free_int_list_node( dslib::ListNode *node ) {
+void IntListNode::free_int_list_node( void *node ) {
   delete static_cast< IntListNode* >( node );
 }
 
-void check_list_contents( const std::vector<int> &expected, const dslib::List< IntListNode > &list ) {
+void check_list_contents(
+  const std::vector<int> &expected,
+  const dslib::List< IntListNode, IntListNode::link_offset() > &list ) {
   ASSERT( expected.size() == list.get_size() );
 
   // check in forward direction
@@ -70,7 +77,7 @@ void assert_fail( const char *msg, const char *filename, int line ) {
 ////////////////////////////////////////////////////////////////////////
 
 struct TestObjs {
-  dslib::List< IntListNode > ilist;
+  dslib::List< IntListNode, IntListNode::link_offset() > ilist;
 
   TestObjs() : ilist( &IntListNode::free_int_list_node ) {
 

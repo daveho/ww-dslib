@@ -66,13 +66,6 @@ public:
   void *remove_last();
   unsigned get_size() const;
 
-private:
-  Link *get_link( void *n ) const {
-    char *p = static_cast< char * >( n );
-    p += m_link_offset;
-    return reinterpret_cast< Link* >( p );
-  }
-
   void *next( void *n ) const {
     DS_ASSERT( n != nullptr );
     return get_link( n )->next;
@@ -81,6 +74,15 @@ private:
   void *prev( void *n ) const {
     DS_ASSERT( n != nullptr );
     return get_link( n )->prev;
+  }
+
+  bool is_empty() const { return m_head == nullptr; }
+
+private:
+  Link *get_link( void *n ) const {
+    char *p = static_cast< char * >( n );
+    p += m_link_offset;
+    return reinterpret_cast< Link* >( p );
   }
 };
 
@@ -154,11 +156,14 @@ public:
   ListNode *next( ListNode *node ) const;
   ListNode *prev( ListNode *node ) const;
 };
+#endif
 
 //! List class, storing a sequence of nodes.
 //! @tparam ActualNodeType the list node type, which should derive
 //!         from ListNode
-template< typename ActualNodeType >
+//! @tparam link_offset offset of the Link fields to be used
+//!         for maintaining the list structure
+template< typename ActualNodeType, unsigned link_offset >
 class List {
 private:
   ListImpl m_impl;
@@ -171,7 +176,7 @@ public:
   //                      the destructor if the list is non-empty to
   //                      to free all remaining nodes)
   List( ListImpl::FreeNodeFn *free_node_fn )
-    : m_impl( free_node_fn ) { }
+    : m_impl( free_node_fn, link_offset ) { }
   
   //! Destructor.
   //! Uses the list's free node function to delete any remaining
@@ -217,30 +222,36 @@ public:
   //! The node becomes owned by the list (and will be
   //! freed by the list's destructor.)
   //! @param node the node to append
-  void prepend( ListNode *node ) {
-    m_impl.prepend( node );
+  void prepend( ActualNodeType *node ) {
+    m_impl.prepend( static_cast<void*>( node ) );
   }
 
   //! Insert a new node before an existing node.
   //! @param node_to_insert the node to insert
   //! @param existing an existing list node
-  void insert_before( ListNode *node_to_insert, ListNode *existing ) {
-    m_impl.insert_before( node_to_insert, existing );
+  void insert_before( ActualNodeType *node_to_insert, ActualNodeType *existing ) {
+    m_impl.insert_before(
+      static_cast<void*>( node_to_insert ),
+      static_cast<void*>( existing )
+    );
   }
 
   //! Insert a new node after an existing node.
   //! @param node_to_insert the node to insert
   //! @param existing an existing list node
-  void insert_after( ListNode *node_to_insert, ListNode *existing ) {
-    m_impl.insert_after( node_to_insert, existing );
+  void insert_after( ActualNodeType *node_to_insert, ActualNodeType *existing ) {
+    m_impl.insert_after(
+      static_cast<void*>( node_to_insert ),
+      static_cast<void*>( existing )
+    );
   }
 
   //! Remove a list node.
   //! The List gives up ownership of the removed node,
   //! so it's the caller's responsibility to free it.
   //! @param existing an existing list node
-  void remove( ListNode *node_to_remove ) {
-    m_impl.remove( node_to_remove );
+  void remove( ActualNodeType *node_to_remove ) {
+    m_impl.remove( static_cast<void*>( node_to_remove ) );
   }
 
   //! Remove the first node in the list.
@@ -265,7 +276,6 @@ public:
   //           an O(N) traversal of the list nodes)
   unsigned get_size() const { return m_impl.get_size(); }
 };
-#endif
 
 } // end namespace dslib
 
