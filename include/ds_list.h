@@ -1,4 +1,4 @@
-// Copyright 2025, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright 2025-2026, David H. Hovemeyer <david.hovemeyer@gmail.com>
 
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -60,6 +60,11 @@ public:
 
   void insert_before( void *node_to_insert, void *existing );
   void insert_after( void *node_to_insert, void *existing );
+
+  void remove( void *node_to_remove );
+  void *remove_first();
+  void *remove_last();
+  unsigned get_size() const;
 
 private:
   Link *get_link( void *n ) const {

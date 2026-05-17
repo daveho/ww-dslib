@@ -1,4 +1,4 @@
-// Copyright 2025, David H. Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright 2025-2026, David H. Hovemeyer <david.hovemeyer@gmail.com>
 
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -71,9 +71,95 @@ void ListImpl::prepend( void *n ) {
 }
 
 void ListImpl::insert_before( void *node_to_insert, void *existing ) {
+  DS_ASSERT( existing != nullptr );
+
+  if ( existing == m_head )
+    prepend( node_to_insert );
+  else {
+    Link *link = get_link( node_to_insert );
+    void *succ = existing;
+    Link *succ_link = get_link( existing );
+    void *pred = succ_link->prev;
+    Link *pred_link = get_link( pred );
+
+    link->prev = pred;
+    link->next = succ;
+    succ_link->prev = node_to_insert;
+    pred_link->next = node_to_insert;
+  }
 }
 
 void ListImpl::insert_after( void *node_to_insert, void *existing ) {
+  DS_ASSERT( existing != nullptr );
+
+  if ( existing == m_tail )
+    append( node_to_insert );
+  else {
+    Link *link = get_link( node_to_insert );
+    void *pred = existing;
+    Link *pred_link = get_link( pred );
+    void *succ = pred_link->next;
+    Link *succ_link = get_link( succ );
+
+    link->prev = pred;
+    link->next = succ;
+    succ_link->prev = node_to_insert;
+    pred_link->next = node_to_insert;
+  }
+}
+
+void ListImpl::remove( void *node_to_remove ) {
+  if ( node_to_remove == m_head )
+    remove_first();
+  else if ( node_to_remove == m_tail )
+    remove_last();
+  else {
+  }
+}
+
+void *ListImpl::remove_first() {
+  DS_ASSERT( m_head != nullptr );
+
+  void *removed = m_head;
+
+  Link *head_link = get_link( m_head );
+  if ( head_link->next == nullptr )
+    // list becomes empty
+    m_head = m_tail = nullptr;
+  else {
+    void *succ = head_link->next;
+    Link *succ_link = get_link( succ );
+    succ_link->prev = nullptr;
+    m_head = succ;
+  }
+
+  return removed;
+}
+
+void *ListImpl::remove_last() {
+  DS_ASSERT( m_tail == nullptr );
+
+  void *removed = m_tail;
+
+  Link *tail_link = get_link( m_tail );
+  if ( tail_link->prev == nullptr )
+    // list becomes empty
+    m_head = m_tail = nullptr;
+  else {
+    void *pred = tail_link->prev;
+    Link *pred_link = get_link( pred );
+    pred_link->next = nullptr;
+    m_tail = pred;
+  }
+
+  return removed;
+}
+
+unsigned ListImpl::get_size() const {
+  unsigned count = 0;
+  for ( auto p = get_first(); p != nullptr; p = next( p ) )
+    ++count;
+  return count;
 }
 
 #if 0
