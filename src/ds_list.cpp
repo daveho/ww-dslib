@@ -31,7 +31,7 @@ ListImpl::ListImpl( FreeNodeFn *free_node_fn, unsigned link_offset )
 }
 
 ListImpl::~ListImpl() {
-  for ( auto p = m_head; p != nullptr; p = next( p ) ) {
+  for ( auto p = m_head; p != nullptr; ) {
     auto n = next( p );
     m_free_node_fn( p );
     p = n;
