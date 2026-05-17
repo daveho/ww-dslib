@@ -23,6 +23,60 @@
 
 namespace dslib {
 
+ListImpl::ListImpl( FreeNodeFn *free_node_fn, unsigned link_offset )
+  : m_head( nullptr )
+  , m_tail( nullptr )
+  , m_free_node_fn( free_node_fn )
+  , m_link_offset( link_offset ) {
+}
+
+ListImpl::~ListImpl() {
+  for ( auto p = m_head; p != nullptr; p = next( p ) ) {
+    auto n = next( p );
+    m_free_node_fn( p );
+    p = n;
+  }
+}
+
+void ListImpl::append( void *n ) {
+  Link *link = get_link( n );
+  if ( m_head == nullptr ) {
+    DS_ASSERT( m_tail == nullptr );
+    m_head = m_tail = n;
+    link->next = link->prev = nullptr;
+  } else {
+    Link *tail_link = get_link( m_tail );
+    link->prev = m_tail;
+    link->next = nullptr;
+    DS_ASSERT( tail_link->next == nullptr );
+    tail_link->next = n;
+    m_tail = n;
+  }
+}
+
+void ListImpl::prepend( void *n ) {
+  Link *link = get_link( n );
+  if ( m_tail == nullptr ) {
+    DS_ASSERT( m_head == nullptr );
+    m_head = m_tail = n;
+    link->next = link->prev = nullptr;
+  } else {
+    Link *head_link = get_link( m_head );
+    link->next = m_head;
+    link->prev = nullptr;
+    DS_ASSERT( head_link->prev == nullptr );
+    head_link->prev = n;
+    m_head = n;
+  }
+}
+
+void ListImpl::insert_before( void *node_to_insert, void *existing ) {
+}
+
+void ListImpl::insert_after( void *node_to_insert, void *existing ) {
+}
+
+#if 0
 ListImpl::ListImpl( FreeNodeFn *free_node_fn )
   : m_free_node_fn( free_node_fn ) {
   DS_ASSERT( m_head.get_prev() == nullptr );
@@ -122,5 +176,6 @@ ListNode *ListImpl::prev( ListNode *node ) const {
   auto pred = node->get_prev();
   return ( pred == &m_head ) ? nullptr : pred;
 }
+#endif
 
 } // end namespace dslib

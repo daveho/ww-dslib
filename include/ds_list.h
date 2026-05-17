@@ -26,6 +26,60 @@
 
 namespace dslib {
 
+//! The node type should contain one instance of Link for
+//! each kind of list the node can be a member of.
+struct Link {
+  void *prev, *next;
+};
+
+//! Low-level list implementation class.
+//! Don't use this directly: use List, parametized with the
+//! node type and the link offset.
+class ListImpl {
+public:
+public:
+  //! Node free function type.
+  typedef void FreeNodeFn( void *n );
+
+private:
+  void *m_head, *m_tail;
+  FreeNodeFn *m_free_node_fn;
+  unsigned m_link_offset;
+
+  NO_VALUE_SEMANTICS(ListImpl);
+
+public:
+  ListImpl( FreeNodeFn *free_node_fn, unsigned link_offset );
+  ~ListImpl();
+
+  void *get_first() const { return m_head; }
+  void *get_last() const { return m_tail; }
+
+  void append( void *n );
+  void prepend( void *n );
+
+  void insert_before( void *node_to_insert, void *existing );
+  void insert_after( void *node_to_insert, void *existing );
+
+private:
+  Link *get_link( void *n ) const {
+    char *p = static_cast< char * >( n );
+    p += m_link_offset;
+    return reinterpret_cast< Link* >( p );
+  }
+
+  void *next( void *n ) const {
+    DS_ASSERT( n != nullptr );
+    return get_link( n )->next;
+  }
+
+  void *prev( void *n ) const {
+    DS_ASSERT( n != nullptr );
+    return get_link( n )->prev;
+  }
+};
+
+#if 0
 class ListImpl;
 
 //! Intrusive list node base class.
@@ -206,6 +260,7 @@ public:
   //           an O(N) traversal of the list nodes)
   unsigned get_size() const { return m_impl.get_size(); }
 };
+#endif
 
 } // end namespace dslib
 
