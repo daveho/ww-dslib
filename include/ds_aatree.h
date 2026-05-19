@@ -231,6 +231,9 @@ public:
   AATreeIterImpl iterator() const;
   AATreePostfixIterImpl postfix_iterator() const;
 
+  // Get pointer to root node
+  AATreeNode *get_root() const { return m_root; }
+
 #ifdef DSLIB_CHECK_INTEGRITY
   // Does AA-tree rooted at given node satisfy the AA-tree properties?
   bool is_valid( AATreeNode *node, int expected_level ) const;
@@ -241,9 +244,6 @@ public:
       return true;
     return is_valid( m_root, m_root->get_level() );
   }
-
-  // Get pointer to root node
-  AATreeNode *get_root() const { return m_root; }
 
   // Get tree height (because of the possibility of right nodes at the
   // same level as the parent, level is not the same as height)
