@@ -137,7 +137,7 @@ void *ListImpl::remove_first() {
 }
 
 void *ListImpl::remove_last() {
-  DS_ASSERT( m_tail == nullptr );
+  DS_ASSERT( m_tail != nullptr );
 
   void *removed = m_tail;
 
