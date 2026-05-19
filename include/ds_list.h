@@ -34,7 +34,7 @@ struct Link {
 
 //! Low-level list implementation class.
 //! Don't use this directly: use List, parametized with the
-//! node type and the link offset.
+//! node type and the node type's Link field offset.
 class ListImpl {
 public:
 public:
@@ -86,79 +86,12 @@ private:
   }
 };
 
-#if 0
-class ListImpl;
-
-//! Intrusive list node base class.
-class ListNode {
-private:
-  ListNode *m_prev, *m_next;
-
-  NO_VALUE_SEMANTICS( ListNode );
-
-public:
-  //! Constructor.
-  ListNode() : m_prev( nullptr ), m_next( nullptr ) { }
-
-  //! Destructor.
-  ~ListNode() {}
-
-  friend class ListImpl;
-
-private:
-  //! @return pointer to previous node (nullptr if there is no previous node)
-  ListNode *get_prev() const { return m_prev; }
-
-  //! Set the previous node pointer.
-  //! @param prev previous node pointer to set
-  void set_prev( ListNode *prev ) { m_prev = prev; }
-
-  //! @return pointer to next node (nullptr if there is no next node)
-  ListNode *get_next() const { return m_next; }
-  
-  //! Set the next node pointer.
-  //! @param next next node pointer to set
-  void set_next( ListNode *next ) { m_next = next; }
-};
-
-//! List header implementation class.
-//! Don't use this directly: instead, use List, parametized with the
-//! actual list node type, which should derive from ListNode.
-class ListImpl {
-public:
-  //! Node free function type.
-  typedef void FreeNodeFn( ListNode *node );
-
-private:
-  FreeNodeFn *m_free_node_fn;
-  // Fake head and tail nodes: same trick as lists in Pintos,
-  // this eliminates special cases in insertions and deletions
-  ListNode m_head, m_tail;
-
-  NO_VALUE_SEMANTICS( ListImpl );
-
-public:
-  ListImpl( FreeNodeFn *free_node_fn );
-  ~ListImpl();
-
-  bool is_empty() const;
-  ListNode *get_first() const;
-  ListNode *get_last() const;
-  void append( ListNode *node );
-  void prepend( ListNode *node );
-  void insert_before( ListNode *node_to_insert, ListNode *existing );
-  void insert_after( ListNode *node_to_insert, ListNode *existing );
-  void remove( ListNode *node_to_remove );
-  ListNode *remove_first();
-  ListNode *remove_last();
-  unsigned get_size() const;
-
-  ListNode *next( ListNode *node ) const;
-  ListNode *prev( ListNode *node ) const;
-};
-#endif
-
 //! List class, storing a sequence of nodes.
+//! Note that the class is parametized by the offset of the
+//! Link field to use to maintain the list structure.
+//! That means that a node type with multiple Link fields can
+//! be on multiple lists at the same time.
+//!
 //! @tparam ActualNodeType the list node type, which should derive
 //!         from ListNode
 //! @tparam link_offset offset of the Link fields to be used
@@ -172,15 +105,16 @@ private:
 
 public:
   //! Constructor.
-  //! @param free_node_fn function to free a list node (called from
-  //                      the destructor if the list is non-empty to
-  //                      to free all remaining nodes)
-  List( ListImpl::FreeNodeFn *free_node_fn )
+  //! @param free_node_fn pointer to function to use to free list nodes;
+  //                      if non-null, called from the destructor if the
+  //                      list is non-empty to to free all remaining nodes
+  List( ListImpl::FreeNodeFn *free_node_fn = nullptr )
     : m_impl( free_node_fn, link_offset ) { }
   
   //! Destructor.
-  //! Uses the list's free node function to delete any remaining
-  //! nodes.
+  //! If the node free function pointer passed to the constructor
+  //! is non-null, uses the list's free node function to delete any
+  //! remaining nodes.
   ~List() { }
 
   //! Get the list node that follows the given one.
