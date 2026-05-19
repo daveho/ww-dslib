@@ -114,6 +114,16 @@ void ListImpl::remove( void *node_to_remove ) {
   else if ( node_to_remove == m_tail )
     remove_last();
   else {
+    Link *link = get_link( node_to_remove );
+    void *pred = link->prev;
+    DS_ASSERT( pred != nullptr );
+    Link *pred_link = get_link( pred );
+    void *succ = link->next;
+    DS_ASSERT( succ != nullptr );
+    Link *succ_link = get_link( succ );
+
+    pred_link->next = succ;
+    succ_link->prev = pred;
   }
 }
 
