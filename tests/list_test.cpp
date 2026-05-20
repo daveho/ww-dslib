@@ -14,7 +14,7 @@ private:
   int m_val;
   dslib::Link link;
 
-  NO_VALUE_SEMANTICS( IntListNode );
+  DS_NO_VALUE_SEMANTICS( IntListNode );
 
 public:
   IntListNode( int val ) : m_val( val ) { }

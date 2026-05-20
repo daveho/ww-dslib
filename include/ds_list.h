@@ -46,7 +46,7 @@ private:
   FreeNodeFn *m_free_node_fn;
   unsigned m_link_offset;
 
-  NO_VALUE_SEMANTICS(ListImpl);
+  DS_NO_VALUE_SEMANTICS(ListImpl);
 
 public:
   ListImpl( FreeNodeFn *free_node_fn, unsigned link_offset );
@@ -101,7 +101,7 @@ class List {
 private:
   ListImpl m_impl;
 
-  NO_VALUE_SEMANTICS( List );
+  DS_NO_VALUE_SEMANTICS( List );
 
 public:
   //! Constructor.

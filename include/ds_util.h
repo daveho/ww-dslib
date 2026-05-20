@@ -24,7 +24,7 @@
 
 // Convenience for declaring copy ctor and assignment
 // operator as nonexistent
-#define NO_VALUE_SEMANTICS(Type) \
+#define DS_NO_VALUE_SEMANTICS(Type) \
   Type( const Type & ) = delete; \
   Type &operator=( const Type & ) = delete
 

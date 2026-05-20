@@ -17,7 +17,7 @@ class IntAATreeNode : public dslib::AATreeNode {
 private:
   int m_val;
 
-  NO_VALUE_SEMANTICS( IntAATreeNode );
+  DS_NO_VALUE_SEMANTICS( IntAATreeNode );
 
 public:
   IntAATreeNode( int val = 0 ) : m_val( val ) { }

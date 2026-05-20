@@ -53,7 +53,7 @@ private:
   AATreeNode *m_left, *m_right;
   int m_level;
 
-  NO_VALUE_SEMANTICS( AATreeNode );
+  DS_NO_VALUE_SEMANTICS( AATreeNode );
 
 public:
   AATreeNode() : m_left( nullptr ), m_right( nullptr ), m_level( 1 ) { }
@@ -213,7 +213,7 @@ private:
   CopyNodeFn *m_copy_node_fn;
   FreeNodeFn *m_free_node_fn;
 
-  NO_VALUE_SEMANTICS( AATreeImpl );
+  DS_NO_VALUE_SEMANTICS( AATreeImpl );
 
 public:
   AATreeImpl( LessThanFn *less_than_fn, CopyNodeFn *copy_node_fn, FreeNodeFn *free_node_fn );
@@ -333,7 +333,7 @@ class AATree {
 private:
   AATreeImpl m_impl;
 
-  NO_VALUE_SEMANTICS( AATree );
+  DS_NO_VALUE_SEMANTICS( AATree );
 
 public:
   //! Constructor.
